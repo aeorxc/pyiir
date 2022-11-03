@@ -83,3 +83,21 @@ def details_call(eventId: str):
     summary = response.json()
     summary = pd.DataFrame(summary['offlineEvents'])
     return summary
+
+def tar_to_timeseries(taramount, startdate, enddate, tarname=None):
+    dr = pd.date_range("01/01/2000", "12/01/2030")
+    ser = pd.Series(0, index=dr)
+    ser[startdate:enddate] = taramount
+    ser.name = tarname
+    return ser
+
+def create_offline_dataset(startdate: str, enddate: str, tradingRegion: str, unitType: str, country: str):
+    df = pd.DataFrame()
+    fin = summary_call(startdate, enddate, tradingRegion, unitType, country)
+    for index, row in fin.iterrows():
+        row = tar_to_timeseries(row['capacityOffline'], row['eventStartDate'], row['eventEndDate'])
+        df = pd.concat([df, row], axis=1)
+    df = (df.sum(axis=1)) / 1000
+    df = df.rename('capacityOffline')
+    df = df.to_frame()
+    return df
