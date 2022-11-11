@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="pyiir",
-    version="0.0.2",
+    version="0.0.3",
     author="jalex1",
     description="Wrapper around IIR",
     url="https://github.com/aeorxc/pyiir",
@@ -16,7 +16,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=["requests", "cachetools", "pandas"],
-    python_requires=">=3.9",
+    python_requires=">=3.8",
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
 )
