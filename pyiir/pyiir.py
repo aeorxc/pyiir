@@ -6,6 +6,7 @@ from cachetools.func import ttl_cache
 token_url = "https://api.industrialinfo.com/idb/v1.4/token"
 offline_events_summary_url = 'https://api.industrialinfo.com/idb/v1.4/offlineevents/summary'
 
+proxies = {'http': 'proxy-rwest-uk.energy.local:8080', 'https': 'proxy-rwest-uk.energy.local:8080'}
 
 def extract_credential(key: str):
     credentials = os.getenv("IIR_API_CREDENTIALS")
@@ -27,7 +28,9 @@ def get_access_token():
         "password": extract_credential("password"),
         "tokeenLifeTime": 30,
     }
-    token_request = requests.post(token_url, params=params)
+
+
+    token_request = requests.post(token_url, params=params, proxies=proxies)
     req_dic = token_request.headers
     access_token = req_dic["AUTHORIZATION"]
     return access_token
@@ -43,7 +46,7 @@ def build_header():
 
 @ttl_cache(ttl=10 * 60)
 def summary_call(startdate: str = None, enddate: str = None, tradingRegion: str = None,
-                 unitType: str = None, country: str = None):
+                 unitType: str = None, unitTypeGroup: str = None, country: str = None):
     fin = pd.DataFrame()
     offset = 0
     while True:
@@ -53,10 +56,11 @@ def summary_call(startdate: str = None, enddate: str = None, tradingRegion: str 
             'offset': offset,
             'eventEndDateMax': enddate,
             "unitTypeDesc": unitType,
+            "unitTypeGroup": unitTypeGroup,
             "physicalAddressCountryName": country,
         }
         headers = build_header()
-        response = requests.post(url=offline_events_summary_url, headers=headers, params=params)
+        response = requests.post(url=offline_events_summary_url, headers=headers, params=params, proxies=proxies)
         summary = response.json()
         if summary['resultCount'] == 0:
             break
@@ -79,7 +83,7 @@ def details_call(eventId: str):
         "eventId": eventId,
     }
     headers = build_header()
-    response = requests.post(url=offline_events_summary_url, headers=headers, params=params)
+    response = requests.post(url=offline_events_summary_url, headers=headers, params=params, proxies=proxies)
     summary = response.json()
     summary = pd.DataFrame(summary['offlineEvents'])
     return summary
