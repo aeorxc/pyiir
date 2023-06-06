@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="pyiir",
-    version="0.0.6",
+    version="0.0.7",
     author="jalex1",
     description="Wrapper around IIR",
     url="https://github.com/aeorxc/pyiir",
